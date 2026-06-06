@@ -78,7 +78,7 @@ jobs:
 
               echo "==> Patching PAM and Polkit for passwordless login..."
               if [ -f /build/airootfs/etc/pam.d/system-login ]; then
-                sed -i 's/user = arch/user = usery/g' /build/airootfs/etc/pam.d/system-login
+                sed -i "s/user = arch/user = usery/g" /build/airootfs/etc/pam.d/system-login
               fi
 
               echo "==> Injecting Wayland Virtualization fallback variables..."
