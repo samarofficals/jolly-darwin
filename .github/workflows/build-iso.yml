@@ -20,11 +20,14 @@ jobs:
             archlinux:latest \
             /bin/bash -c "
               # Update and install build dependencies
-              pacman -Syu --noconfirm archiso git
+              pacman -Syu --noconfirm archiso git grub mtools dosfstools libisoburn syslinux
               
-              # Copy profile to writable location
+              # Create build directory and use releng as a base for bootloader configs
               mkdir -p /build
-              cp -r /workspace/usery-iso/* /build/
+              cp -a /usr/share/archiso/configs/releng/* /build/
+              
+              # Overwrite with our custom Usery OS configuration
+              cp -a /workspace/usery-iso/* /build/
               
               # Build the ISO
               cd /build
