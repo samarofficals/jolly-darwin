@@ -40,6 +40,34 @@ jobs:
               ln -sf /usr/lib/systemd/system/sddm.service /build/airootfs/etc/systemd/system/graphical.target.wants/sddm.service
               ln -sf /usr/lib/systemd/system/NetworkManager.service /build/airootfs/etc/systemd/system/multi-user.target.wants/NetworkManager.service
               ln -sf /usr/lib/systemd/system/graphical.target /build/airootfs/etc/systemd/system/default.target
+              # Brand the Bootloader
+              find /build/syslinux /build/grub -type f -exec sed -i 's/Arch Linux install medium/Usery OS Live Environment/g' {} + 2>/dev/null || true
+              find /build/syslinux /build/grub -type f -exec sed -i 's/Arch Linux/Usery OS/g' {} + 2>/dev/null || true
+              
+              # Configure Live User (usery)
+              if [ -f /build/airootfs/etc/passwd ]; then
+                sed -i 's/^arch:/usery:/g' /build/airootfs/etc/passwd
+                sed -i 's/\/home\/arch/\/home\/usery/g' /build/airootfs/etc/passwd
+              fi
+              if [ -f /build/airootfs/etc/shadow ]; then
+                sed -i 's/^arch:/usery:/g' /build/airootfs/etc/shadow
+              fi
+              if [ -f /build/airootfs/etc/group ]; then
+                sed -i 's/^arch:/usery:/g' /build/airootfs/etc/group
+              fi
+              if [ -f /build/airootfs/etc/gshadow ]; then
+                sed -i 's/^arch:/usery:/g' /build/airootfs/etc/gshadow
+              fi
+              if [ -f /build/airootfs/etc/sysusers.d/arch.conf ]; then
+                sed -i 's/ u arch / u usery /g' /build/airootfs/etc/sysusers.d/arch.conf
+                sed -i 's/ m arch / m usery /g' /build/airootfs/etc/sysusers.d/arch.conf
+                sed -i 's/\/home\/arch/\/home\/usery/g' /build/airootfs/etc/sysusers.d/arch.conf
+                mv /build/airootfs/etc/sysusers.d/arch.conf /build/airootfs/etc/sysusers.d/usery.conf
+              fi
+              if [ -f /build/airootfs/etc/sudoers.d/10_archlinux ]; then
+                sed -i 's/arch ALL/usery ALL/g' /build/airootfs/etc/sudoers.d/10_archlinux
+                mv /build/airootfs/etc/sudoers.d/10_archlinux /build/airootfs/etc/sudoers.d/10_usery
+              fi
               
               # Build the ISO
               cd /build
