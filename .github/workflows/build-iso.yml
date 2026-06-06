@@ -38,12 +38,7 @@ jobs:
               mkdir -p /build
               cp -a /usr/share/archiso/configs/releng/. /build/
 
-              echo "==> Injecting CachyOS repo for Calamares..."
-              echo "" >> /build/pacman.conf
-              echo "[cachyos]" >> /build/pacman.conf
-              echo "SigLevel = Never" >> /build/pacman.conf
-              echo "Server = https://mirror.cachyos.org/repo/x86_64/cachyos" >> /build/pacman.conf
-              
+
               pacman -Sy
 
               echo "==> Copying Usery OS customizations..."
