@@ -29,6 +29,14 @@ jobs:
               # Overwrite with our custom Usery OS configuration
               cp -a /workspace/usery-iso/* /build/
               
+              # Enable GUI (SDDM) and graphical target for the live ISO
+              mkdir -p /build/airootfs/etc/systemd/system/graphical.target.wants
+              mkdir -p /build/airootfs/etc/systemd/system/multi-user.target.wants
+              ln -sf /usr/lib/systemd/system/sddm.service /build/airootfs/etc/systemd/system/display-manager.service
+              ln -sf /usr/lib/systemd/system/sddm.service /build/airootfs/etc/systemd/system/graphical.target.wants/sddm.service
+              ln -sf /usr/lib/systemd/system/NetworkManager.service /build/airootfs/etc/systemd/system/multi-user.target.wants/NetworkManager.service
+              ln -sf /usr/lib/systemd/system/graphical.target /build/airootfs/etc/systemd/system/default.target
+              
               # Build the ISO
               cd /build
               mkarchiso -v -w /tmp/archiso-tmp -o /workspace/out .
