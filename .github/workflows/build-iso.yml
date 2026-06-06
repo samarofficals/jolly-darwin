@@ -46,20 +46,16 @@ jobs:
 
               echo "==> Creating live user: usery..."
               mkdir -p /build/airootfs/etc/sysusers.d
-              cat << 'EOF' > /build/airootfs/etc/sysusers.d/10-usery.conf
-u usery 1000 "Usery Live Account" /home/usery /bin/bash
-g autologin - -
-m usery autologin
-m usery wheel
-m usery video
-m usery audio
-m usery input
-EOF
+              echo "u usery 1000 \"Usery Live Account\" /home/usery /bin/bash" > /build/airootfs/etc/sysusers.d/10-usery.conf
+              echo "g autologin - -" >> /build/airootfs/etc/sysusers.d/10-usery.conf
+              echo "m usery autologin" >> /build/airootfs/etc/sysusers.d/10-usery.conf
+              echo "m usery wheel" >> /build/airootfs/etc/sysusers.d/10-usery.conf
+              echo "m usery video" >> /build/airootfs/etc/sysusers.d/10-usery.conf
+              echo "m usery audio" >> /build/airootfs/etc/sysusers.d/10-usery.conf
+              echo "m usery input" >> /build/airootfs/etc/sysusers.d/10-usery.conf
 
               mkdir -p /build/airootfs/etc/tmpfiles.d
-              cat << 'EOF' > /build/airootfs/etc/tmpfiles.d/10-usery.conf
-d /home/usery 0700 usery usery - -
-EOF
+              echo "d /home/usery 0700 usery usery - -" > /build/airootfs/etc/tmpfiles.d/10-usery.conf
 
               # Patch sudoers for usery
               mkdir -p /build/airootfs/etc/sudoers.d
