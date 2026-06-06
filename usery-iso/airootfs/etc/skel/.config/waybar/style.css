@@ -1,136 +1,153 @@
+/* Usery OS Glassmorphic Waybar Stylesheet */
+
 * {
     border: none;
     border-radius: 0;
-    font-family: Inter, Roboto, Helvetica, Arial, sans-serif;
-    font-size: 13px;
+    font-family: "Inter", "Roboto", "Helvetica Neue", "Symbols Nerd Font", sans-serif;
+    font-size: 14px;
+    font-weight: 500;
     min-height: 0;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-window#waybar {
-    background-color: rgba(26, 27, 38, 0.8);
-    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
-    color: #ffffff;
-    transition-property: background-color;
-    transition-duration: .5s;
-}
+/* =============================================================================
+   TOP BAR
+   ============================================================================= */
 
-window#waybar.hidden {
-    opacity: 0.2;
-}
-
-#workspaces button {
-    padding: 0 5px;
+window#waybar.top {
     background-color: transparent;
     color: #ffffff;
-    border-bottom: 3px solid transparent;
 }
 
-#workspaces button:hover {
-    background: rgba(0, 0, 0, 0.2);
-    box-shadow: inherit;
-    border-bottom: 3px solid #ffffff;
+#waybar.top #custom-brand {
+    font-size: 14px;
+    font-weight: 700;
+    color: #ffffff;
+    padding: 0 8px;
 }
 
-#workspaces button.active {
-    background-color: #64727D;
-    border-bottom: 3px solid #ffffff;
+#waybar.top #clock {
+    background-color: rgba(30, 30, 46, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 18px;
+    color: #ffffff;
+    padding: 4px 16px;
+    margin: 4px 0;
+    font-weight: 600;
 }
 
-#workspaces button.urgent {
-    background-color: #eb4d4b;
-}
-
-#mode {
-    background-color: #64727D;
-    border-bottom: 3px solid #ffffff;
-}
-
-#clock,
-#battery,
-#cpu,
-#memory,
-#disk,
-#temperature,
-#backlight,
-#network,
-#pulseaudio,
-#wireplumber,
-#custom-media,
-#tray,
-#mode,
-#idle_inhibitor,
-#scratchpad,
-#mpd {
+#waybar.top #network,
+#waybar.top #pulseaudio,
+#waybar.top #battery,
+#waybar.top #backlight,
+#waybar.top #custom-power {
     padding: 0 10px;
+    font-size: 15px;
     color: #ffffff;
 }
 
-#window,
-#image,
-#workspaces {
-    margin: 0 4px;
+#waybar.top #custom-power {
+    color: #f38ba8;
+    padding-right: 14px;
 }
 
-.modules-left > widget:first-child > #image {
-    margin-left: 10px;
+#waybar.top #battery.charging {
+    color: #a6e3a1;
 }
 
-.modules-left > widget:first-child > #workspaces {
-    margin-left: 0;
-}
-
-.modules-right > widget:last-child > #workspaces {
-    margin-right: 0;
-}
-
-#clock {
-    font-weight: bold;
-    color: #a9b1d6;
-}
-
-#battery {
-    background-color: #ffffff;
-    color: #000000;
-}
-
-#battery.charging, #battery.plugged {
-    background-color: #26A65B;
-    color: #ffffff;
+#waybar.top #battery.critical:not(.charging) {
+    color: #f38ba8;
+    animation: blink 0.5s alternate infinite;
 }
 
 @keyframes blink {
     to {
-        background-color: #ffffff;
-        color: #000000;
+        color: rgba(243, 139, 168, 0.3);
     }
 }
 
-#battery.critical:not(.charging) {
-    background-color: #f53c3c;
-    color: #ffffff;
-    animation-name: blink;
-    animation-duration: 0.5s;
-    animation-timing-function: linear;
-    animation-iteration-count: infinite;
-    animation-direction: alternate;
+/* =============================================================================
+   BOTTOM DOCK
+   ============================================================================= */
+
+window#waybar.bottom {
+    background-color: rgba(15, 15, 22, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 24px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    padding: 6px;
 }
 
-#cpu {
-    color: #2ecc71;
+/* Base styles for dock icons */
+#waybar.bottom #custom-term,
+#waybar.bottom #custom-files,
+#waybar.bottom #custom-browser,
+#waybar.bottom #custom-installer,
+#waybar.bottom #custom-code,
+#waybar.bottom #custom-settings,
+#waybar.bottom #custom-launcher {
+    font-size: 20px;
+    padding: 8px 16px;
+    margin: 2px;
+    border-radius: 16px;
+    color: #cdd6f4;
+    background-color: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-#memory {
-    color: #9b59b6;
+/* Hover effects with subtle lift/scale and glowing colors */
+#waybar.bottom #custom-term:hover {
+    color: #11111b;
+    background-color: #a6e3a1; /* Green */
+    box-shadow: 0 0 12px rgba(166, 227, 161, 0.4);
+    margin-top: -4px;
+    margin-bottom: 6px;
 }
 
-#network {
-    color: #3498db;
+#waybar.bottom #custom-files:hover {
+    color: #11111b;
+    background-color: #89b4fa; /* Blue */
+    box-shadow: 0 0 12px rgba(137, 180, 250, 0.4);
+    margin-top: -4px;
+    margin-bottom: 6px;
 }
 
-#pulseaudio {
-    color: #f1c40f;
+#waybar.bottom #custom-browser:hover {
+    color: #11111b;
+    background-color: #89dceb; /* Sky Blue */
+    box-shadow: 0 0 12px rgba(137, 220, 235, 0.4);
+    margin-top: -4px;
+    margin-bottom: 6px;
 }
 
-#pulseaudio.muted {
-    color: #95a5a6;
+#waybar.bottom #custom-installer:hover {
+    color: #11111b;
+    background-color: #cba6f7; /* Purple */
+    box-shadow: 0 0 12px rgba(203, 166, 247, 0.4);
+    margin-top: -4px;
+    margin-bottom: 6px;
+}
+
+#waybar.bottom #custom-code:hover {
+    color: #11111b;
+    background-color: #f9e2af; /* Yellow */
+    box-shadow: 0 0 12px rgba(249, 226, 175, 0.4);
+    margin-top: -4px;
+    margin-bottom: 6px;
+}
+
+#waybar.bottom #custom-settings:hover {
+    color: #11111b;
+    background-color: #94e2d5; /* Teal */
+    box-shadow: 0 0 12px rgba(148, 226, 213, 0.4);
+    margin-top: -4px;
+    margin-bottom: 6px;
+}
+
+#waybar.bottom #custom-launcher:hover {
+    color: #11111b;
+    background-color: #f38ba8; /* Pink/Red */
+    box-shadow: 0 0 12px rgba(243, 139, 168, 0.4);
+    margin-top: -4px;
+    margin-bottom: 6px;
 }
