@@ -5,7 +5,11 @@ on:
     branches: [ main, master ]
     tags: [ 'v*' ]
   workflow_dispatch:
-
+    inputs:
+      test_cloud:
+        description: 'Test in Cloud VNC (Zero Download)?'
+        type: boolean
+        default: false
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -55,3 +59,33 @@ jobs:
           files: out/*.iso
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Test in Cloud VNC
+        if: ${{ github.event.inputs.test_cloud == 'true' }}
+        run: |
+          echo "Installing Cloud Testing Tools..."
+          sudo apt-get update
+          sudo apt-get install -y qemu-system-x86 novnc websockify
+          wget -q https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+          sudo dpkg -i cloudflared-linux-amd64.deb
+          
+          echo "Booting Usery OS ISO in QEMU..."
+          qemu-system-x86_64 -m 4096 -smp 4 -cdrom out/*.iso -boot d -vnc :0 -enable-kvm -net nic -net user &
+          
+          echo "Starting noVNC server..."
+          websockify --web=/usr/share/novnc/ 8080 localhost:5900 &
+          
+          echo "Establishing Cloudflare Tunnel..."
+          cloudflared tunnel --url http://localhost:8080 > cloudflared.log 2>&1 &
+          
+          echo "Waiting for Tunnel URL..."
+          sleep 10
+          
+          echo "========================================================"
+          echo "🚀 CLOUD VNC DESKTOP IS READY!"
+          echo "🔗 Click this link to view Usery OS in your browser:"
+          grep -o 'https://[-a-zA-Z0-9]*\.trycloudflare\.com' cloudflared.log | head -n 1 | awk '{print $1"/vnc.html"}'
+          echo "========================================================"
+          
+          echo "VM is running. Workflow will remain open for 30 minutes for testing."
+          sleep 1800
