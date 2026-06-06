@@ -48,6 +48,8 @@ jobs:
               # Patch releng sysusers
               if [ -f /build/airootfs/etc/sysusers.d/arch.conf ]; then
                 sed -i "s/arch/usery/g" /build/airootfs/etc/sysusers.d/arch.conf
+                echo "g autologin -" >> /build/airootfs/etc/sysusers.d/arch.conf
+                echo "m usery autologin" >> /build/airootfs/etc/sysusers.d/arch.conf
                 mv /build/airootfs/etc/sysusers.d/arch.conf \
                    /build/airootfs/etc/sysusers.d/usery.conf
               fi
@@ -73,6 +75,18 @@ jobs:
                 /build/airootfs/etc/systemd/system/multi-user.target.wants/NetworkManager.service
               ln -sf /usr/lib/systemd/system/graphical.target \
                 /build/airootfs/etc/systemd/system/default.target
+
+              echo "==> Patching PAM and Polkit for passwordless login..."
+              if [ -f /build/airootfs/etc/pam.d/system-login ]; then
+                sed -i 's/user = arch/user = usery/g' /build/airootfs/etc/pam.d/system-login
+              fi
+
+              echo "==> Injecting Wayland Virtualization fallback variables..."
+              mkdir -p /build/airootfs/etc
+              echo "WLR_NO_HARDWARE_CURSORS=1" >> /build/airootfs/etc/environment
+              echo "WLR_RENDERER_ALLOW_SOFTWARE=1" >> /build/airootfs/etc/environment
+              echo "LIBGL_ALWAYS_SOFTWARE=1" >> /build/airootfs/etc/environment
+              echo "XDG_SESSION_TYPE=wayland" >> /build/airootfs/etc/environment
 
               echo "==> Branding bootloader..."
               find /build/syslinux /build/grub -type f 2>/dev/null | xargs -I{} sed -i \
