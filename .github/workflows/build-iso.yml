@@ -2,8 +2,8 @@ name: Build Usery OS ISO
 
 on:
   push:
-    branches: [ main, master ]
-    tags: [ 'v*' ]
+    branches: [main, master]
+    tags: ['v*']
   workflow_dispatch:
     inputs:
       test_cloud:
@@ -39,10 +39,12 @@ jobs:
               cp -a /usr/share/archiso/configs/releng/. /build/
 
               echo "==> Injecting Chaotic-AUR for Calamares..."
+              pacman-key --recv-key 3056513887B78AEB --keyserver keyserver.ubuntu.com || true
+              pacman-key --lsign-key 3056513887B78AEB || true
+              pacman -U --noconfirm 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst' || true
               echo "" >> /build/pacman.conf
               echo "[chaotic-aur]" >> /build/pacman.conf
-              echo "SigLevel = Never" >> /build/pacman.conf
-              echo "Server = https://geo-mirror.chaotic.cx/chaotic-aur/x86_64" >> /build/pacman.conf
+              echo "Server = https://geo-mirror.chaotic.cx/\$repo/x86_64" >> /build/pacman.conf
 
               echo "==> Copying Usery OS customizations..."
               cp -a /workspace/usery-iso/. /build/
