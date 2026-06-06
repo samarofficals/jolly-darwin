@@ -17,7 +17,7 @@ git
 curl
 wget
 nano
-neofetch
+fastfetch
 htop
 bash-completion
 
@@ -60,8 +60,5 @@ ttf-liberation
 noto-fonts
 noto-fonts-emoji
 
-# Installer (Calamares)
-calamares
-kpmcore
-qt5-svg
-qt5-xmlpatterns
+# Installer
+archinstall
