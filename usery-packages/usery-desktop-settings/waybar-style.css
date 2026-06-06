@@ -66,8 +66,13 @@ window#waybar.hidden {
 }
 
 #window,
+#image,
 #workspaces {
     margin: 0 4px;
+}
+
+.modules-left > widget:first-child > #image {
+    margin-left: 10px;
 }
 
 .modules-left > widget:first-child > #workspaces {

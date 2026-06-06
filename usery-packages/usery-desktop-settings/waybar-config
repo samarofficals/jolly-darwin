@@ -3,13 +3,19 @@
     "position": "top",
     "height": 30,
     "spacing": 4,
-    "modules-left": ["hyprland/workspaces", "hyprland/mode"],
+    "modules-left": ["image#logo", "hyprland/workspaces", "hyprland/mode"],
     "modules-center": ["clock"],
     "modules-right": ["pulseaudio", "network", "cpu", "memory", "battery", "tray"],
     "hyprland/workspaces": {
         "disable-scroll": true,
         "all-outputs": true,
         "format": "{name}"
+    },
+    "image#logo": {
+        "path": "/usr/share/pixmaps/usery_logo.png",
+        "size": 22,
+        "on-click": "wofi --show drun",
+        "tooltip": false
     },
     "tray": {
         "icon-size": 21,
