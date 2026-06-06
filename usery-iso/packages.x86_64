@@ -1,0 +1,63 @@
+# Base System
+base
+linux
+linux-firmware
+archlinux-keyring
+grub
+efibootmgr
+sudo
+
+# Network & Utilities
+networkmanager
+git
+curl
+wget
+nano
+neofetch
+htop
+bash-completion
+
+# Sound Server (Pipewire)
+pipewire
+pipewire-alsa
+pipewire-pulse
+pipewire-jack
+wireplumber
+
+# Display & Graphics Drivers
+xf86-video-vesa
+mesa
+vulkan-intel
+vulkan-radeon
+
+# Window Manager & Wayland Environment
+hyprland
+hyprpaper
+waybar
+sddm
+kitty
+wofi
+dunst
+polkit-kde-agent
+xdg-desktop-portal-hyprland
+xdg-desktop-portal-gtk
+qt5-wayland
+qt6-wayland
+
+# User Applications
+thunar
+firefox
+gvfs
+tumbler
+
+# Fonts
+ttf-dejavu
+ttf-liberation
+noto-fonts
+noto-fonts-emoji
+
+# Installer (Calamares)
+calamares
+kpmcore
+qt5-svg
+qt5-xmlpatterns

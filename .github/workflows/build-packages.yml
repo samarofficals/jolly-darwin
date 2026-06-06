@@ -1,0 +1,54 @@
+name: Build & Publish Custom Packages
+
+on:
+  push:
+    paths:
+      - 'usery-packages/**'
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build-packages:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Build Packages in Docker
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/workspace \
+            archlinux:latest \
+            /bin/bash -c "
+              # Install compilation tools
+              pacman -Syu --noconfirm base-devel git
+              
+              # Add a build user because makepkg cannot run as root
+              useradd -m builduser
+              echo 'builduser ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
+              
+              # Change ownership of the workspace
+              chown -R builduser:builduser /workspace
+              
+              # Build the package
+              sudo -u builduser bash -c '
+                cd /workspace/usery-packages/usery-desktop-settings
+                makepkg -s --noconfirm
+              '
+              
+              # Create directory for release packages
+              mkdir -p /workspace/repo/x86_64
+              mv /workspace/usery-packages/usery-desktop-settings/*.pkg.tar.zst /workspace/repo/x86_64/
+
+              # Generate/Update Pacman Repository Database
+              cd /workspace/repo/x86_64
+              repo-add usery.db.tar.gz *.pkg.tar.zst
+            "
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./repo
+          publish_branch: gh-pages
+          force_orphan: false

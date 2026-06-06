@@ -1,0 +1,46 @@
+name: Build Usery OS ISO
+
+on:
+  push:
+    branches: [ main, master ]
+    tags: [ 'v*' ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Build ISO using Docker
+        run: |
+          docker run --privileged --rm \
+            -v ${{ github.workspace }}:/workspace \
+            archlinux:latest \
+            /bin/bash -c "
+              # Update and install build dependencies
+              pacman -Syu --noconfirm archiso git
+              
+              # Copy profile to writable location
+              mkdir -p /build
+              cp -r /workspace/usery-iso/* /build/
+              
+              # Build the ISO
+              cd /build
+              mkarchiso -v -w /tmp/archiso-tmp -o /workspace/out .
+            "
+
+      - name: Upload ISO Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Usery-OS-ISO
+          path: out/*.iso
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: out/*.iso
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

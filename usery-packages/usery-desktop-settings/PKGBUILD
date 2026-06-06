@@ -1,0 +1,34 @@
+# PKGBUILD for Usery OS desktop settings and defaults
+pkgname=usery-desktop-settings
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="Default configuration files, themes, and backgrounds for Usery OS"
+arch=('any')
+url="https://github.com/usery-project"
+license=('GPL')
+depends=('hyprland' 'waybar' 'hyprpaper' 'kitty' 'wofi' 'dunst')
+source=('hyprland.conf'
+        'waybar-config'
+        'waybar-style.css'
+        'kitty.conf'
+        'hyprpaper.conf'
+        'usery_wallpaper.png')
+sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
+
+package() {
+    # Install background
+    install -Dm644 "${srcdir}/usery_wallpaper.png" "${pkgdir}/usr/share/backgrounds/usery/usery_wallpaper.png"
+
+    # Install skeletons to /etc/skel for new users
+    install -Dm644 "${srcdir}/hyprland.conf" "${pkgdir}/etc/skel/.config/hypr/hyprland.conf"
+    install -Dm644 "${srcdir}/hyprpaper.conf" "${pkgdir}/etc/skel/.config/hypr/hyprpaper.conf"
+    install -Dm644 "${srcdir}/waybar-config" "${pkgdir}/etc/skel/.config/waybar/config"
+    install -Dm644 "${srcdir}/waybar-style.css" "${pkgdir}/etc/skel/.config/waybar/style.css"
+    install -Dm644 "${srcdir}/kitty.conf" "${pkgdir}/etc/skel/.config/kitty/kitty.conf"
+
+    # Install central defaults to /usr/share/usery
+    install -Dm644 "${srcdir}/hyprland.conf" "${pkgdir}/usr/share/usery/config/hyprland.conf"
+    install -Dm644 "${srcdir}/waybar-config" "${pkgdir}/usr/share/usery/config/waybar-config"
+    install -Dm644 "${srcdir}/waybar-style.css" "${pkgdir}/usr/share/usery/config/waybar-style.css"
+    install -Dm644 "${srcdir}/kitty.conf" "${pkgdir}/usr/share/usery/config/kitty.conf"
+}
