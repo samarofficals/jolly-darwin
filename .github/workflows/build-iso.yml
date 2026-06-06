@@ -38,16 +38,11 @@ jobs:
               mkdir -p /build
               cp -a /usr/share/archiso/configs/releng/. /build/
 
-              echo "==> Injecting Chaotic-AUR for Calamares..."
-              pacman-key --init
-              pacman-key --recv-key 3056513887B78AEB --keyserver keyserver.ubuntu.com
-              pacman-key --lsign-key 3056513887B78AEB
-              pacman -U --noconfirm 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst'
-              pacman -U --noconfirm 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst'
-              
-              # Copy mirrorlist to build directory for mkarchiso to use
-              mkdir -p /build/pacman.d
-              cp /etc/pacman.d/chaotic-mirrorlist /build/pacman.d/
+              echo "==> Injecting CachyOS repo for Calamares..."
+              echo "" >> /build/pacman.conf
+              echo "[cachyos]" >> /build/pacman.conf
+              echo "SigLevel = Never" >> /build/pacman.conf
+              echo "Server = https://mirror.cachyos.org/repo/x86_64/cachyos" >> /build/pacman.conf
               
               pacman -Sy
 

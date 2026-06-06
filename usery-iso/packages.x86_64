@@ -13,7 +13,7 @@ sudo
 archiso
 mkinitcpio-archiso
 arch-install-scripts
-calamares
+cachyos-calamares
 squashfs-tools
 erofs-utils
 dosfstools
