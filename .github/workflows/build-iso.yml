@@ -22,7 +22,7 @@ jobs:
           docker run --privileged --rm \
             -v ${{ github.workspace }}:/workspace \
             archlinux:latest \
-            /bin/bash -c "
+            /bin/bash -ec "
               # Update and install build dependencies
               pacman -Syu --noconfirm archiso git grub mtools dosfstools libisoburn syslinux
               
@@ -34,7 +34,7 @@ jobs:
               echo "" >> /build/pacman.conf
               echo "[chaotic-aur]" >> /build/pacman.conf
               echo "SigLevel = Never" >> /build/pacman.conf
-              echo "Server = https://cdn-mirror.chaotic.cx/chaotic-aur/\$arch" >> /build/pacman.conf
+              echo "Server = https://cdn-mirror.chaotic.cx/chaotic-aur/x86_64" >> /build/pacman.conf
               
               # Overwrite with our custom Usery OS configuration
               cp -a /workspace/usery-iso/* /build/
