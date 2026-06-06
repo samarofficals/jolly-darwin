@@ -10,6 +10,8 @@ memtest86+-efi
 edk2-shell
 efibootmgr
 sudo
+archiso
+arch-install-scripts
 
 # Network & Utilities
 networkmanager
