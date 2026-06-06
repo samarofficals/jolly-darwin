@@ -55,7 +55,8 @@ jobs:
               echo "m usery input" >> /build/airootfs/etc/sysusers.d/10-usery.conf
 
               mkdir -p /build/airootfs/etc/tmpfiles.d
-              echo "d /home/usery 0700 usery usery - -" > /build/airootfs/etc/tmpfiles.d/10-usery.conf
+              echo "C /home/usery - - - - /etc/skel" > /build/airootfs/etc/tmpfiles.d/10-usery.conf
+              echo "z /home/usery 0700 usery usery - -" >> /build/airootfs/etc/tmpfiles.d/10-usery.conf
 
               # Patch sudoers for usery
               mkdir -p /build/airootfs/etc/sudoers.d
