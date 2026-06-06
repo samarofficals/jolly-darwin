@@ -10,6 +10,7 @@ on:
         description: 'Test in Cloud VNC (Zero Download)?'
         type: boolean
         default: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -17,68 +18,87 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Build ISO using Docker
+      - name: Build ISO (Native Arch Linux Docker)
         run: |
+          set -euo pipefail
+
           docker run --privileged --rm \
-            -v ${{ github.workspace }}:/workspace \
+            -v "${{ github.workspace }}:/workspace" \
             archlinux:latest \
-            /bin/bash -ec "
-              # Update and install build dependencies
-              pacman -Syu --noconfirm archiso git grub mtools dosfstools libisoburn syslinux
-              
-              # Create build directory and use releng as a base for bootloader configs
+            bash -ec '
+              set -euo pipefail
+              echo "==> Updating pacman database..."
+              pacman -Syu --noconfirm
+
+              echo "==> Installing build tools..."
+              pacman -S --noconfirm archiso mkinitcpio-archiso grub mtools dosfstools \
+                libisoburn syslinux efibootmgr squashfs-tools erofs-utils
+
+              echo "==> Preparing build directory from releng template..."
               mkdir -p /build
-              cp -a /usr/share/archiso/configs/releng/* /build/
-              
-              # Inject Chaotic-AUR repository to download Calamares GUI Installer without keyserver issues
-              echo "" >> /build/pacman.conf
-              echo "[chaotic-aur]" >> /build/pacman.conf
-              echo "SigLevel = Never" >> /build/pacman.conf
-              echo "Server = https://cdn-mirror.chaotic.cx/chaotic-aur/x86_64" >> /build/pacman.conf
-              
-              # Overwrite with our custom Usery OS configuration
-              cp -a /workspace/usery-iso/* /build/
-              
-              # Enable GUI (SDDM) and graphical target for the live ISO
+              cp -a /usr/share/archiso/configs/releng/. /build/
+
+              echo "==> Injecting Chaotic-AUR for Calamares..."
+              cat >> /build/pacman.conf << '"'"'EOF'"'"'
+
+[chaotic-aur]
+SigLevel = Never
+Server = https://geo-mirror.chaotic.cx/chaotic-aur/x86_64
+EOF
+
+              echo "==> Copying Usery OS customizations..."
+              cp -a /workspace/usery-iso/. /build/
+
+              echo "==> Creating live user: usery..."
+              # Patch releng sysusers
+              if [ -f /build/airootfs/etc/sysusers.d/arch.conf ]; then
+                sed -i "s/arch/usery/g" /build/airootfs/etc/sysusers.d/arch.conf
+                mv /build/airootfs/etc/sysusers.d/arch.conf \
+                   /build/airootfs/etc/sysusers.d/usery.conf
+              fi
+              # Patch sudoers
+              if [ -f /build/airootfs/etc/sudoers.d/10_archlinux ]; then
+                sed -i "s/arch/usery/g" /build/airootfs/etc/sudoers.d/10_archlinux
+                mv /build/airootfs/etc/sudoers.d/10_archlinux \
+                   /build/airootfs/etc/sudoers.d/10_usery
+              fi
+              # Patch passwd/shadow/group if they exist
+              for f in passwd shadow group gshadow; do
+                [ -f /build/airootfs/etc/$f ] && sed -i "s/^arch:/usery:/g" /build/airootfs/etc/$f
+              done
+
+              echo "==> Enabling systemd services..."
               mkdir -p /build/airootfs/etc/systemd/system/graphical.target.wants
               mkdir -p /build/airootfs/etc/systemd/system/multi-user.target.wants
-              ln -sf /usr/lib/systemd/system/sddm.service /build/airootfs/etc/systemd/system/display-manager.service
-              ln -sf /usr/lib/systemd/system/sddm.service /build/airootfs/etc/systemd/system/graphical.target.wants/sddm.service
-              ln -sf /usr/lib/systemd/system/NetworkManager.service /build/airootfs/etc/systemd/system/multi-user.target.wants/NetworkManager.service
-              ln -sf /usr/lib/systemd/system/graphical.target /build/airootfs/etc/systemd/system/default.target
-              # Brand the Bootloader
-              find /build/syslinux /build/grub -type f -exec sed -i 's/Arch Linux install medium/Usery OS Live Environment/g' {} + 2>/dev/null || true
-              find /build/syslinux /build/grub -type f -exec sed -i 's/Arch Linux/Usery OS/g' {} + 2>/dev/null || true
-              
-              # Configure Live User (usery)
-              if [ -f /build/airootfs/etc/passwd ]; then
-                sed -i 's/^arch:/usery:/g' /build/airootfs/etc/passwd
-                sed -i 's/\/home\/arch/\/home\/usery/g' /build/airootfs/etc/passwd
-              fi
-              if [ -f /build/airootfs/etc/shadow ]; then
-                sed -i 's/^arch:/usery:/g' /build/airootfs/etc/shadow
-              fi
-              if [ -f /build/airootfs/etc/group ]; then
-                sed -i 's/^arch:/usery:/g' /build/airootfs/etc/group
-              fi
-              if [ -f /build/airootfs/etc/gshadow ]; then
-                sed -i 's/^arch:/usery:/g' /build/airootfs/etc/gshadow
-              fi
-              if [ -f /build/airootfs/etc/sysusers.d/arch.conf ]; then
-                sed -i 's/ u arch / u usery /g' /build/airootfs/etc/sysusers.d/arch.conf
-                sed -i 's/ m arch / m usery /g' /build/airootfs/etc/sysusers.d/arch.conf
-                sed -i 's/\/home\/arch/\/home\/usery/g' /build/airootfs/etc/sysusers.d/arch.conf
-                mv /build/airootfs/etc/sysusers.d/arch.conf /build/airootfs/etc/sysusers.d/usery.conf
-              fi
-              if [ -f /build/airootfs/etc/sudoers.d/10_archlinux ]; then
-                sed -i 's/arch ALL/usery ALL/g' /build/airootfs/etc/sudoers.d/10_archlinux
-                mv /build/airootfs/etc/sudoers.d/10_archlinux /build/airootfs/etc/sudoers.d/10_usery
-              fi
-              
-              # Build the ISO
-              cd /build
-              mkarchiso -v -w /tmp/archiso-tmp -o /workspace/out .
-            "
+              ln -sf /usr/lib/systemd/system/sddm.service \
+                /build/airootfs/etc/systemd/system/display-manager.service
+              ln -sf /usr/lib/systemd/system/sddm.service \
+                /build/airootfs/etc/systemd/system/graphical.target.wants/sddm.service
+              ln -sf /usr/lib/systemd/system/NetworkManager.service \
+                /build/airootfs/etc/systemd/system/multi-user.target.wants/NetworkManager.service
+              ln -sf /usr/lib/systemd/system/graphical.target \
+                /build/airootfs/etc/systemd/system/default.target
+
+              echo "==> Branding bootloader..."
+              find /build/syslinux /build/grub -type f 2>/dev/null | xargs -I{} sed -i \
+                -e "s/Arch Linux install medium/Usery OS Live Environment/g" \
+                -e "s/Arch Linux/Usery OS/g" {} || true
+
+              echo "==> Running mkarchiso..."
+              mkarchiso -v -w /tmp/archiso-tmp -o /workspace/out /build
+
+              echo "==> Build complete! ISO files:"
+              ls -lh /workspace/out/*.iso
+            '
+
+      - name: Verify ISO was created
+        run: |
+          if ! ls out/*.iso 1>/dev/null 2>&1; then
+            echo "ERROR: No ISO file found in out/! The build failed silently."
+            exit 1
+          fi
+          echo "ISO found:"
+          ls -lh out/*.iso
 
       - name: Upload ISO Artifact
         uses: actions/upload-artifact@v4
@@ -95,31 +115,53 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Test in Cloud VNC
-        if: success() && github.event.inputs.test_cloud == 'true'
+        if: github.event.inputs.test_cloud == 'true'
         run: |
-          echo "Installing Cloud Testing Tools..."
-          sudo apt-get update
+          set -euo pipefail
+
+          echo "==> Installing Cloud VNC tools..."
+          sudo apt-get update -qq
           sudo apt-get install -y qemu-system-x86 novnc websockify
+
           wget -q https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
           sudo dpkg -i cloudflared-linux-amd64.deb
-          
-          echo "Booting Usery OS ISO in QEMU..."
-          qemu-system-x86_64 -m 4096 -smp 4 -cdrom out/*.iso -boot d -vnc :0 -enable-kvm -net nic -net user &
-          
-          echo "Starting noVNC server..."
+
+          ISO_FILE=$(ls out/*.iso | head -n 1)
+          echo "==> Booting ISO: $ISO_FILE"
+
+          qemu-system-x86_64 \
+            -m 4096 \
+            -smp 4 \
+            -cdrom "$ISO_FILE" \
+            -boot d \
+            -vnc :0 \
+            -enable-kvm \
+            -device virtio-net,netdev=net0 \
+            -netdev user,id=net0 \
+            -vga virtio \
+            -cpu host \
+            -no-reboot &
+
+          echo "==> Waiting 5s for QEMU to start..."
+          sleep 5
+
+          echo "==> Starting noVNC..."
           websockify --web=/usr/share/novnc/ 8080 localhost:5900 &
-          
-          echo "Establishing Cloudflare Tunnel..."
+
+          echo "==> Starting Cloudflare tunnel..."
           cloudflared tunnel --url http://localhost:8080 > cloudflared.log 2>&1 &
-          
-          echo "Waiting for Tunnel URL..."
-          sleep 10
-          
+
+          echo "==> Waiting 20s for tunnel URL..."
+          sleep 20
+
+          TUNNEL_URL=$(grep -o 'https://[-a-zA-Z0-9]*\.trycloudflare\.com' cloudflared.log | head -n 1 || echo "URL not found yet")
+
           echo "========================================================"
-          echo "🚀 CLOUD VNC DESKTOP IS READY!"
-          echo "🔗 Click this link to view Usery OS in your browser:"
-          grep -o 'https://[-a-zA-Z0-9]*\.trycloudflare\.com' cloudflared.log | head -n 1 | awk '{print $1"/vnc.html"}'
+          echo "🚀 USERY OS CLOUD DESKTOP IS READY!"
+          echo "🔗 Open this link in your browser:"
+          echo "   ${TUNNEL_URL}/vnc.html"
+          echo "   (Click Connect - no password needed)"
           echo "========================================================"
-          
-          echo "VM is running. Workflow will remain open for 30 minutes for testing."
-          sleep 1800
+
+          echo "Keeping VM alive for 25 minutes..."
+          sleep 1500
