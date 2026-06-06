@@ -45,24 +45,26 @@ jobs:
               cp -a /workspace/usery-iso/. /build/
 
               echo "==> Creating live user: usery..."
-              # Patch releng sysusers
-              if [ -f /build/airootfs/etc/sysusers.d/arch.conf ]; then
-                sed -i "s/arch/usery/g" /build/airootfs/etc/sysusers.d/arch.conf
-                echo "g autologin -" >> /build/airootfs/etc/sysusers.d/arch.conf
-                echo "m usery autologin" >> /build/airootfs/etc/sysusers.d/arch.conf
-                mv /build/airootfs/etc/sysusers.d/arch.conf \
-                   /build/airootfs/etc/sysusers.d/usery.conf
-              fi
-              # Patch sudoers
-              if [ -f /build/airootfs/etc/sudoers.d/10_archlinux ]; then
-                sed -i "s/arch/usery/g" /build/airootfs/etc/sudoers.d/10_archlinux
-                mv /build/airootfs/etc/sudoers.d/10_archlinux \
-                   /build/airootfs/etc/sudoers.d/10_usery
-              fi
-              # Patch passwd/shadow/group if they exist
-              for f in passwd shadow group gshadow; do
-                [ -f /build/airootfs/etc/$f ] && sed -i "s/^arch:/usery:/g" /build/airootfs/etc/$f
-              done
+              mkdir -p /build/airootfs/etc/sysusers.d
+              cat << 'EOF' > /build/airootfs/etc/sysusers.d/10-usery.conf
+u usery 1000 "Usery Live Account" /home/usery /bin/bash
+g autologin - -
+m usery autologin
+m usery wheel
+m usery video
+m usery audio
+m usery input
+EOF
+
+              mkdir -p /build/airootfs/etc/tmpfiles.d
+              cat << 'EOF' > /build/airootfs/etc/tmpfiles.d/10-usery.conf
+d /home/usery 0700 usery usery - -
+EOF
+
+              # Patch sudoers for usery
+              mkdir -p /build/airootfs/etc/sudoers.d
+              echo "usery ALL=(ALL) NOPASSWD: ALL" > /build/airootfs/etc/sudoers.d/10_usery
+              chmod 440 /build/airootfs/etc/sudoers.d/10_usery
 
               echo "==> Enabling systemd services..."
               mkdir -p /build/airootfs/etc/systemd/system/graphical.target.wants
