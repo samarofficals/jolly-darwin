@@ -9,7 +9,7 @@ on:
       test_cloud:
         description: 'Test in Cloud VNC (Zero Download)?'
         type: boolean
-        default: false
+        default: true
 
 jobs:
   build:
@@ -81,7 +81,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Test in Cloud VNC
-        if: github.event.inputs.test_cloud == 'true'
+        if: success()
         run: |
           set -euo pipefail
 
