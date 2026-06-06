@@ -12,6 +12,10 @@ efibootmgr
 sudo
 archiso
 arch-install-scripts
+squashfs-tools
+erofs-utils
+dosfstools
+mtools
 
 # Network & Utilities
 networkmanager
