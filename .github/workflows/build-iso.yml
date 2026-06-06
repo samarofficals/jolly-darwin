@@ -39,12 +39,10 @@ jobs:
               cp -a /usr/share/archiso/configs/releng/. /build/
 
               echo "==> Injecting Chaotic-AUR for Calamares..."
-              cat >> /build/pacman.conf << '"'"'EOF'"'"'
-
-[chaotic-aur]
-SigLevel = Never
-Server = https://geo-mirror.chaotic.cx/chaotic-aur/x86_64
-EOF
+              echo "" >> /build/pacman.conf
+              echo "[chaotic-aur]" >> /build/pacman.conf
+              echo "SigLevel = Never" >> /build/pacman.conf
+              echo "Server = https://geo-mirror.chaotic.cx/chaotic-aur/x86_64" >> /build/pacman.conf
 
               echo "==> Copying Usery OS customizations..."
               cp -a /workspace/usery-iso/. /build/
