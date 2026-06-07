@@ -9,12 +9,13 @@ license=('GPL')
 depends=('hyprland' 'waybar' 'hyprpaper' 'kitty' 'wofi' 'dunst' 'nwg-look' 'pavucontrol' 'network-manager-applet' 'blueman')
 source=('hyprland.conf'
         'waybar-config'
+        'waybar-config-dock'
         'waybar-style.css'
         'kitty.conf'
         'hyprpaper.conf'
         'usery_wallpaper.png'
         'usery_logo.png')
-sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
+sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
 
 package() {
     # Install background and logo
@@ -25,12 +26,14 @@ package() {
     install -Dm644 "${srcdir}/hyprland.conf" "${pkgdir}/etc/skel/.config/hypr/hyprland.conf"
     install -Dm644 "${srcdir}/hyprpaper.conf" "${pkgdir}/etc/skel/.config/hypr/hyprpaper.conf"
     install -Dm644 "${srcdir}/waybar-config" "${pkgdir}/etc/skel/.config/waybar/config"
+    install -Dm644 "${srcdir}/waybar-config-dock" "${pkgdir}/etc/skel/.config/waybar/config-dock"
     install -Dm644 "${srcdir}/waybar-style.css" "${pkgdir}/etc/skel/.config/waybar/style.css"
     install -Dm644 "${srcdir}/kitty.conf" "${pkgdir}/etc/skel/.config/kitty/kitty.conf"
 
     # Install central defaults to /usr/share/usery
     install -Dm644 "${srcdir}/hyprland.conf" "${pkgdir}/usr/share/usery/config/hyprland.conf"
     install -Dm644 "${srcdir}/waybar-config" "${pkgdir}/usr/share/usery/config/waybar-config"
+    install -Dm644 "${srcdir}/waybar-config-dock" "${pkgdir}/usr/share/usery/config/waybar-config-dock"
     install -Dm644 "${srcdir}/waybar-style.css" "${pkgdir}/usr/share/usery/config/waybar-style.css"
     install -Dm644 "${srcdir}/kitty.conf" "${pkgdir}/usr/share/usery/config/kitty.conf"
 }

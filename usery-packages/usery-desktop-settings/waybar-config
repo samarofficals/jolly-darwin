@@ -1,54 +1,59 @@
 {
     "layer": "top",
     "position": "top",
-    "height": 30,
+    "height": 40,
     "spacing": 4,
-    "modules-left": ["image#logo", "hyprland/workspaces", "hyprland/mode"],
+    "modules-left": ["image#logo", "custom/brand"],
     "modules-center": ["clock"],
-    "modules-right": ["pulseaudio", "network", "cpu", "memory", "battery", "tray"],
-    "hyprland/workspaces": {
-        "disable-scroll": true,
-        "all-outputs": true,
-        "format": "{name}"
-    },
+    "modules-right": ["network", "pulseaudio", "battery", "backlight", "custom/power"],
+    
     "image#logo": {
         "path": "/usr/share/pixmaps/usery_logo.png",
-        "size": 22,
+        "size": 18,
         "on-click": "wofi --show drun",
         "tooltip": false
     },
-    "tray": {
-        "icon-size": 21,
-        "spacing": 10
-    },
-    "clock": {
-        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
-        "format-alt": "{:%Y-%m-%d}"
-    },
-    "cpu": {
-        "format": "CPU: {usage}%",
+    "custom/brand": {
+        "format": "Usery OS",
         "tooltip": false
     },
-    "memory": {
-        "format": "RAM: {}%"
+    "clock": {
+        "format": "{:%a %b %e  %I:%M %p}",
+        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
+    },
+    "network": {
+        "format-wifi": "",
+        "format-ethernet": "󰈀",
+        "format-disconnected": "󰤮",
+        "tooltip-format": "WiFi: {essid} ({signalStrength}%)",
+        "on-click": "kitty -e nmtui"
+    },
+    "pulseaudio": {
+        "format": "{icon}",
+        "format-muted": "󰝟",
+        "format-icons": {
+            "default": ["󰕿", "󰖀", "󰕾"]
+        },
+        "on-click": "pavucontrol",
+        "tooltip-format": "Volume: {volume}%"
     },
     "battery": {
         "states": {
             "warning": 30,
             "critical": 15
         },
-        "format": "BAT: {capacity}%",
-        "format-charging": "BAT: {capacity}% ⚡",
-        "format-plugged": "BAT: {capacity}% 🔌"
+        "format": "{icon}  {capacity}%",
+        "format-charging": "󰂄  {capacity}%",
+        "format-plugged": "󰚥  {capacity}%",
+        "format-icons": ["󰂎", "󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"]
     },
-    "network": {
-        "format-wifi": "WiFi: {essid} ({signalStrength}%)",
-        "format-ethernet": "ETH: {ipaddr}/{cidr}",
-        "format-disconnected": "Disconnected ⚠"
+    "backlight": {
+        "format": "",
+        "tooltip-format": "Brightness: {percent}%"
     },
-    "pulseaudio": {
-        "format": "VOL: {volume}%",
-        "format-muted": "MUTED 🔇",
-        "on-click": "pavucontrol"
+    "custom/power": {
+        "format": "⏻",
+        "on-click": "systemctl poweroff",
+        "tooltip": false
     }
 }

@@ -1,114 +1,59 @@
-[
-    {
-        "layer": "top",
-        "position": "top",
-        "height": 40,
-        "spacing": 4,
-        "modules-left": ["image#logo", "custom/brand"],
-        "modules-center": ["clock"],
-        "modules-right": ["network", "pulseaudio", "battery", "backlight", "custom/power"],
-        
-        "image#logo": {
-            "path": "/usr/share/pixmaps/usery_logo.png",
-            "size": 18,
-            "on-click": "wofi --show drun",
-            "tooltip": false
-        },
-        "custom/brand": {
-            "format": "Usery OS",
-            "tooltip": false
-        },
-        "clock": {
-            "format": "{:%a %b %e  %I:%M %p}",
-            "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
-        },
-        "network": {
-            "format-wifi": "",
-            "format-ethernet": "󰈀",
-            "format-disconnected": "󰤮",
-            "tooltip-format": "WiFi: {essid} ({signalStrength}%)",
-            "on-click": "kitty -e nmtui"
-        },
-        "pulseaudio": {
-            "format": "{icon}",
-            "format-muted": "󰝟",
-            "format-icons": {
-                "default": ["󰕿", "󰖀", "󰕾"]
-            },
-            "on-click": "pavucontrol",
-            "tooltip-format": "Volume: {volume}%"
-        },
-        "battery": {
-            "states": {
-                "warning": 30,
-                "critical": 15
-            },
-            "format": "{icon}  {capacity}%",
-            "format-charging": "󰂄  {capacity}%",
-            "format-plugged": "󰚥  {capacity}%",
-            "format-icons": ["󰂎", "󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"]
-        },
-        "backlight": {
-            "format": "",
-            "tooltip-format": "Brightness: {percent}%"
-        },
-        "custom/power": {
-            "format": "⏻",
-            "on-click": "systemctl poweroff",
-            "tooltip": false
-        }
+{
+    "layer": "top",
+    "position": "top",
+    "height": 40,
+    "spacing": 4,
+    "modules-left": ["image#logo", "custom/brand"],
+    "modules-center": ["clock"],
+    "modules-right": ["network", "pulseaudio", "battery", "backlight", "custom/power"],
+    
+    "image#logo": {
+        "path": "/usr/share/pixmaps/usery_logo.png",
+        "size": 18,
+        "on-click": "wofi --show drun",
+        "tooltip": false
     },
-    {
-        "layer": "top",
-        "position": "bottom",
-        "height": 56,
-        "margin-bottom": 12,
-        "spacing": 8,
-        "width": 480,
-        "modules-center": [
-            "custom/term",
-            "custom/files",
-            "custom/browser",
-            "custom/installer",
-            "custom/code",
-            "custom/settings",
-            "custom/launcher"
-        ],
-        
-        "custom/term": {
-            "format": "",
-            "on-click": "kitty",
-            "tooltip-format": "Terminal"
+    "custom/brand": {
+        "format": "Usery OS",
+        "tooltip": false
+    },
+    "clock": {
+        "format": "{:%a %b %e  %I:%M %p}",
+        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
+    },
+    "network": {
+        "format-wifi": "",
+        "format-ethernet": "󰈀",
+        "format-disconnected": "󰤮",
+        "tooltip-format": "WiFi: {essid} ({signalStrength}%)",
+        "on-click": "kitty -e nmtui"
+    },
+    "pulseaudio": {
+        "format": "{icon}",
+        "format-muted": "󰝟",
+        "format-icons": {
+            "default": ["󰕿", "󰖀", "󰕾"]
         },
-        "custom/files": {
-            "format": "",
-            "on-click": "thunar",
-            "tooltip-format": "Files"
+        "on-click": "pavucontrol",
+        "tooltip-format": "Volume: {volume}%"
+    },
+    "battery": {
+        "states": {
+            "warning": 30,
+            "critical": 15
         },
-        "custom/browser": {
-            "format": "",
-            "on-click": "firefox",
-            "tooltip-format": "Browser"
-        },
-        "custom/installer": {
-            "format": "󰏗",
-            "on-click": "sudo -E calamares",
-            "tooltip-format": "Install Usery OS"
-        },
-        "custom/code": {
-            "format": "",
-            "on-click": "kitty -e nano",
-            "tooltip-format": "Text Editor"
-        },
-        "custom/settings": {
-            "format": "⚙",
-            "on-click": "kitty",
-            "tooltip-format": "System Settings"
-        },
-        "custom/launcher": {
-            "format": "",
-            "on-click": "wofi --show drun",
-            "tooltip-format": "App Launcher"
-        }
+        "format": "{icon}  {capacity}%",
+        "format-charging": "󰂄  {capacity}%",
+        "format-plugged": "󰚥  {capacity}%",
+        "format-icons": ["󰂎", "󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"]
+    },
+    "backlight": {
+        "format": "",
+        "tooltip-format": "Brightness: {percent}%"
+    },
+    "custom/power": {
+        "format": "⏻",
+        "on-click": "systemctl poweroff",
+        "tooltip": false
     }
-]
+}
