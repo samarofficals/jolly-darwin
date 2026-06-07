@@ -45,10 +45,24 @@ jobs:
               echo "LIBGL_ALWAYS_SOFTWARE=1" >> /build/airootfs/etc/environment
               echo "XDG_SESSION_TYPE=wayland" >> /build/airootfs/etc/environment
 
+              echo "==> Converting text file symlinks to real symbolic links..."
+              find /build/airootfs -type f | while read -r file; do
+                if [ -f "$file" ] && [ ! -s "$file" ]; then continue; fi
+                first_line=$(head -n 1 "$file" 2>/dev/null || true)
+                if [[ "$first_line" =~ ^/(usr|etc|var|run|bin|sbin|lib|lib64|proc|sys|dev)/ ]]; then
+                  if [[ ! "$first_line" =~ [[:space:]] ]] && [ ${#first_line} -lt 256 ]; then
+                    echo "Converting symlink: $file -> $first_line"
+                    rm -f "$file"
+                    ln -s "$first_line" "$file"
+                  fi
+                fi
+              done
+
               echo "==> Branding bootloader..."
               find /build/syslinux /build/grub -type f 2>/dev/null | xargs -I{} sed -i \
                 -e "s/Arch Linux install medium/Usery OS Live Environment/g" \
                 -e "s/Arch Linux/Usery OS/g" {} || true
+
 
               echo "==> Running mkarchiso..."
               mkarchiso -v -w /tmp/archiso-tmp -o /workspace/out /build
